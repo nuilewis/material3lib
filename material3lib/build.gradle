@@ -27,6 +27,39 @@ android {
     }
 }
 
+
 dependencies {
     implementation 'com.google.android.material:material:1.9.0'
+}
+
+
+def githubProperties = new Properties()
+githubProperties.load(new FileInputStream(rootProject.file("github.properties")))
+
+publishing {
+    repositories {
+
+        maven{
+            name = "GithubPackages"
+            url = "https://maven.pkg.github.com/nuilewis/material3lib"
+
+            credentials {
+
+                username = githubProperties['GITHUB_ACTOR']
+                password = githubProperties['GITHUB_TOKEN']
+            }
+
+        }
+
+
+    }
+    publications {
+        bar(MavenPublication){
+
+            groupId 'com.nuilewis'
+            artifactId 'material3lib'
+            version '1.0.0'
+        }
+    }
+
 }
