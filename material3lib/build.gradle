@@ -45,11 +45,6 @@ dependencies {
 
 }
 
-
-def githubProperties = new Properties()
-githubProperties.load(new FileInputStream(rootProject.file("github.properties")))
-
-
 publishing {
 
     publications {
@@ -57,7 +52,7 @@ publishing {
         maven(MavenPublication){
             groupId 'com.nuilewis'
             artifactId 'material3lib'
-            version '1.0.19'
+            version '1.0.20'
             afterEvaluate{
                 from components.release
             }
@@ -85,13 +80,11 @@ publishing {
             url = "https://maven.pkg.github.com/nuilewis/material3lib"
 
             credentials {
-
-                username = githubProperties['GITHUB_ACTOR']
-                password = githubProperties['GITHUB_TOKEN']
+                username = System.getenv('GITHUB_ACTOR')
+                password = System.getenv('GITHUB_TOKEN')
             }
 
         }
-
 
     }
 
