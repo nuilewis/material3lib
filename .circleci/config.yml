@@ -57,10 +57,7 @@ jobs:
       - run:
           name: Build Library
           command: ./gradlew assemble
-      - persist_to_workspace:
-          root: /tmp/workspace
-          paths:
-            - /tmp/workspaces
+
       - store_artifacts:
           path: /tmp/artifacts
 
@@ -101,5 +98,9 @@ workflows:
   say-hello-workflow:
     jobs:
       - test
-      - build
-      - deploy
+      - build:
+          requires:
+            - test
+      - deploy:
+          requires:
+            - build
