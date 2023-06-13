@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace 'com.example.material3lib'
+    namespace 'com.nuilewis.material3lib'
     compileSdk 33
 
     defaultConfig {
@@ -25,18 +25,59 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    publishing{
+        singleVariant('release'){
+            withSourcesJar()
+        }
+    }
 }
 
 
 dependencies {
+
     implementation 'com.google.android.material:material:1.9.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
 }
 
 
 def githubProperties = new Properties()
 githubProperties.load(new FileInputStream(rootProject.file("github.properties")))
 
+
 publishing {
+
+    publications {
+
+        maven(MavenPublication){
+            groupId 'com.nuilewis'
+            artifactId 'material3lib'
+            version '1.0.19'
+            afterEvaluate{
+                from components.release
+            }
+
+            pom {
+                name = 'Material 3 Lib'
+                description = "A Simple Library that uses Material 3 as a transitive dependency"
+                developers {
+                    developer {
+                        id = 'nuilewis'
+                        name = "Nuikweh Lewis"
+                        email = "test@nuilewis.com"
+                    }
+                }
+            }
+
+            //artifact("$buildDir/outputs/aar/material3lib-release.aar")
+            //artifact(task.outputs.getFiles().getSingleFile())
+        }
+    }
     repositories {
 
         maven{
@@ -52,14 +93,6 @@ publishing {
         }
 
 
-    }
-    publications {
-        bar(MavenPublication){
-
-            groupId 'com.nuilewis'
-            artifactId 'material3lib'
-            version '1.0.0'
-        }
     }
 
 }

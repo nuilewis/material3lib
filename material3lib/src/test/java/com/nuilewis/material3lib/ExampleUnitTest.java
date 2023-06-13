@@ -1,4 +1,4 @@
-package com.example.material3lib;
+package com.nuilewis.material3lib;
 
 import org.junit.Test;
 
