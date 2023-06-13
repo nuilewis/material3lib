@@ -28,11 +28,14 @@ jobs:
       - run:
           name: Run tests
           command: ./gradlew test
+      - store_test_results:
+          path: ""
+
 
   build:
   
     docker:
-      - image: cimg/android:2023.02
+      - image: cimg/android:2023.06
     steps:
       - checkout
       - restore_cache:
@@ -52,11 +55,17 @@ jobs:
       - run:
           name: Build Library
           command: ./gradlew assemble
+      - persist_to_workspace:
+          root: /tmp/workspace
+          paths:
+            - ""
+      - store_artifacts:
+          path: ""
 
   deploy:
   
     docker:
-      - image: cimg/android:2023.02
+      - image: cimg/android:2023.06
     steps:
       - checkout
       - restore_cache:
@@ -72,10 +81,15 @@ jobs:
           paths:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
-   
+
+      - attach_workspace:
+          at: /tmp/workspace
+
       - run:
-          name: Run tests
+          name: Publish library
           command: ./gradlew publish
+
+      
 
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
