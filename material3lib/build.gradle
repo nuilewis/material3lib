@@ -1,3 +1,5 @@
+import java.text.SimpleDateFormat
+
 plugins {
     id 'com.android.library'
     id 'maven-publish'
@@ -10,7 +12,6 @@ android {
     defaultConfig {
         minSdk 21
         targetSdk 33
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
     }
@@ -19,8 +20,14 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            versionNameSuffix "-RELEASE"
+        }
+        debug {
+            versionNameSuffix "-DEBUG"
         }
     }
+
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -45,14 +52,40 @@ dependencies {
 
 }
 
-publishing {
+
+def getVersion (){
+
+    // Gets the appropriate version name depending on the current branch.
+    // 'RELEASE' will be appended to the version number for the 'main' branch and
+    // 'SNAPSHOT' along with the 'build Date' will be appended for any other branch that is not
+    //  the main branch such as a 'dev' branch
+
+    String branchName = 'git rev-parse --abbrev-ref HEAD'.execute().text.trim()
+
+    String buildDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())
+
+    String version
+
+    if(branchName == "main"){
+        version = "RELEASE"
+
+    } else{
+        version = "SNAPSHOT -$buildDate"
+    }
+
+    return version
+}
+
+String artifactVersion = getVersion()
+
+        publishing {
 
     publications {
 
         maven(MavenPublication){
             groupId 'com.nuilewis'
             artifactId 'material3lib'
-            version '1.0.20'
+            version "1.0.0-$artifactVersion"
             afterEvaluate{
                 from components.release
             }
