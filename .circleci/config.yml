@@ -102,7 +102,7 @@ jobs:
             echo ${CIRCLE_API_KEY}
             curl --request POST \
               --url https://circleci.com/api/v2/project/github/nuilewis/customtestapp/pipeline \
-              --header 'authorization: Basic ${CIRCLE_API_KEY}' \
+              --header 'authorization: Basic nuilewis' \
               --header 'content-type: application/json' \
               --data '{"branch":"main"}' \
             
