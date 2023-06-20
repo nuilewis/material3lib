@@ -102,7 +102,7 @@ jobs:
             echo $CIRCLECI_API_TOKEN
             curl --request POST \
               --url https://circleci.com/api/v2/project/github/nuilewis/customtestapp/pipeline \
-              --header "Circle-Token: $CIRCLECI_API_TOKEN" \
+              --header "Circle-Token: CCIPAT_6YvAWvjrYpvgdStvYpnMZb_7bfe7c3b54405ccc9f6be7ac460fbe30612c1ce5" \
               --header "content-type: application/json" \
               --data '{"branch":"main"}' \
             
