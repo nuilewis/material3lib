@@ -99,11 +99,13 @@ jobs:
       - run:
           name: Trigger children pipelines
           command: |
+            echo "circleci tokens"
             echo ${CIRCLE_API_KEY}
             echo $CIRCLE_OIDC_TOKEN_V2
+            echo $CIRCLE_TOKEN
             curl --request POST \
               --url https://circleci.com/api/v2/project/github/nuilewis/customtestapp/pipeline \
-              --header 'Circle-Token: ${CIRCLE_OIDC_TOKEN_V2}' \
+              --header 'Circle-Token: $CIRCLE_TOKEN}' \
               --header 'content-type: application/json' \
               --data '{"branch":"main"}' \
             
