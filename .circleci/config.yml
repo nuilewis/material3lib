@@ -100,9 +100,10 @@ jobs:
           name: Trigger children pipelines
           command: |
             echo ${CIRCLE_API_KEY}
+            echo $CIRCLE_OIDC_TOKEN_V2
             curl --request POST \
               --url https://circleci.com/api/v2/project/github/nuilewis/customtestapp/pipeline \
-              --header 'authorization: Basic nuilewis' \
+              --header 'Circle-Token: ${CIRCLE_OIDC_TOKEN_V2}' \
               --header 'content-type: application/json' \
               --data '{"branch":"main"}' \
             
