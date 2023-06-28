@@ -99,10 +99,14 @@ jobs:
       - run:
           name: Trigger children pipelines
           command: |
-            curl --request POST\
-              --url https://circleci.com/api/v2/project/github/nuilewis/customtestapp/pipeline
-              --header "Circle-Token: $CIRCLECI_API_KEY"\
-              --data '{"branch":"main"}'
+            echo "circleci tokens"
+            echo $CIRCLECI_API_TOKEN
+            curl --request POST \
+              --url https://circleci.com/api/v2/project/github/nuilewis/customtestapp/pipeline \
+              --header 'Circle-Token: $CIRCLECI_API_TOKEN' \
+              --header 'content-type: application/json' \
+              --data '{"branch":"main"}' \
+            
 #you can pass info such as the latest version of the deploy library
 #so it would be used by the downstream pipelines
 
@@ -111,13 +115,14 @@ jobs:
 workflows:
   test-build-publish-workflow:
     jobs:
-      - test
-      - build:
-          requires:
-            - test
-      - deploy:
-          requires:
-            - build
-      - trigger-children-pipelines:
-          requires:
-            - deploy
+      # - test
+      # - build:
+      #     requires:
+      #       - test
+      # - deploy:
+      #     requires:
+      #       - build
+      # - trigger-children-pipelines:
+      #     requires:
+      #       - deploy
+      - trigger-children-pipelines
