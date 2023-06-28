@@ -99,12 +99,9 @@ jobs:
       - run:
           name: Trigger children pipelines
           command: |
-            echo "circleci tokens"
-            echo $CIRCLECI_API_TOKEN
-            echo $API_TOKEN
             curl --request POST \
               --url https://circleci.com/api/v2/project/gh/nuilewis/customtestapp/pipeline \
-              --header 'Circle-Token: $API_TOKEN' \
+              --header 'Circle-Token: ${API_TOKEN}' \
               --header 'content-type: application/json' \
               -u '${API_TOKEN}:' \
               --data '{"branch":"main"}' \
