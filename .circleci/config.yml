@@ -103,9 +103,9 @@ jobs:
             echo $CIRCLECI_API_TOKEN
             curl --request POST \
               --url https://circleci.com/api/v2/project/gh/nuilewis/customtestapp/pipeline \
-              --header 'Circle-Token: $CIRCLECI_API_TOKEN' \
+              --header 'Circle-Token: CCIPAT_VFGZJErcszC2kjeWtfMDR4_cd91200bd8e0c5d1d8edb832abc036a8b9f474d1' \
               --header 'content-type: application/json' \
-              -u '${CIRCLECI_API_TOKEN}:' \
+            #  -u '${CIRCLECI_API_TOKEN}:' \
               --data '{"branch":"main"}' \
 
 #you can pass info such as the latest version of the deploy library
