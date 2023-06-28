@@ -20,10 +20,30 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            versionNameSuffix "-RELEASE"
+            versionNameSuffix "-release"
         }
         debug {
-            versionNameSuffix "-DEBUG"
+            versionNameSuffix "-debug"
+        }
+    }
+
+    flavorDimensions "version"
+
+    productFlavors{
+        major {
+            dimension "version"
+           // applicationIdSuffix ".major"
+            versionNameSuffix "-major"
+        }
+        dev {
+            dimension "version"
+           // applicationIdSuffix ".dev"
+            versionNameSuffix "-dev"
+        }
+        snapshot{
+            dimension "version"
+           // applicationIdSuffix ".snapshot"
+            versionNameSuffix ".snapshot"
         }
     }
 
@@ -34,8 +54,13 @@ android {
     }
 
     publishing{
-        singleVariant('release'){
-            withSourcesJar()
+        multipleVariants{
+            allVariants()
+//            includeBuildTypeValues('debug', 'release')
+//            includeFlavorDimensionAndValues('major')
+//            includeFlavorDimensionAndValues('dev')
+//            includeFlavorDimensionAndValues('snapshot')
+           withSourcesJar()
         }
     }
 }
@@ -53,7 +78,7 @@ dependencies {
 }
 
 
-def getVersion (){
+def static getVersion (){
 
     // Gets the appropriate version name depending on the current branch.
     // 'RELEASE' will be appended to the version number for the 'main' branch and
@@ -78,7 +103,9 @@ def getVersion (){
 
 String artifactVersion = getVersion()
 
+
         publishing {
+
 
     publications {
 
@@ -87,7 +114,7 @@ String artifactVersion = getVersion()
             artifactId 'material3lib'
             version "1.0.0-$artifactVersion"
             afterEvaluate{
-                from components.release
+                from components.with {}
             }
 
             pom {
