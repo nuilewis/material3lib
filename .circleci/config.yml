@@ -112,14 +112,13 @@ jobs:
 workflows:
   test-build-publish-workflow:
     jobs:
-      # - test
-      # - build:
-      #     requires:
-      #       - test
-      # - deploy:
-      #     requires:
-      #       - build
-      # - trigger-children-pipelines:
-      #     requires:
-      #       - deploy
-      - trigger-children-pipelines
+      - test
+      - build:
+          requires:
+            - test
+      - deploy:
+          requires:
+            - build
+      - trigger-children-pipelines:
+          requires:
+            - deploy
