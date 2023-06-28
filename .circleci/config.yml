@@ -99,9 +99,9 @@ jobs:
       - run:
           name: Trigger children pipelines
           command: |
-            curl --location --request POST "https://circleci.com/api/v2/project/gh/nuilewis/customtestapp/pipeline" \
+            curl --location --request POST "https://circleci.com/api/v2/project/github/nuilewis/customtestapp/pipeline" \
               --header 'Content-Type: application/json' \
-              -u '${API_TOKEN}:' \
+              -u "${API_TOKEN}:" \
               --data '{"branch":"main"}' \
 
 #you can pass info such as the latest version of the deploy library
