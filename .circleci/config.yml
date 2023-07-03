@@ -92,12 +92,12 @@ workflows:
   test-build-publish-workflow:
     jobs:
       - test
-      - build:
-          requires:
-            - test
+      - build
       - deploy:
           requires:
+            - test
             - build
+
       - trigger-children-pipelines:
           requires:
             - deploy
