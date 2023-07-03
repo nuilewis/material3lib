@@ -2,90 +2,70 @@
 # See: https://circleci.com/docs/configuration-reference
 version: 2.1
 
+orbs:
+  android: circleci/android@2.3.0
 jobs:
   test:
-  
-    docker:
-      - image: cimg/android:2023.06
+    executor:
+      name: android/android-machine
+      resource-class: large
+      tag: 2023.06.1
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "build.gradle" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
-
       - run:
-          name: "Download Dependencies"
-          command: |
-            chmod +x gradlew
-            ./gradlew androidDependencies
-      - save_cache:
-          paths:
-            - ~/.gradle
-          key: v1-dependencies-{{ checksum "build.gradle" }}
-   
+          name: Chmod Permissions
+          command: sudo chmod +x gradlew
       - run:
-          name: Run tests
+          name: Download Dependencies
+          command: ./gradlew androidDependencies
+      - run:
+          name: run unit test
           command: ./gradlew test
-      - store_test_results:
-          path: build/test-results/testDebugUnitTest/
+      - android/run-tests:
+          test-command: ./gradlew test
+      - android/save-gradle-cache:
+          cache-prefix: v1a
 
 
   build:
-  
-    docker:
-      - image: cimg/android:2023.06
+    executor:
+      image: android/android-docker
+      resource-class: large
+      tag: 2023.06.1
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "build.gradle" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
-
+      - android/restore-gradle-cache
       - run:
-          name: "Download Dependencies"
-          command: |
-            chmod +x gradlew
-            ./gradlew androidDependencies
-      - save_cache:
-          paths:
-            - ~/.gradle
-          key: v1-dependencies-{{ checksum "build.gradle" }}
-   
+          name: Chmod Permissions
+          command: sudo chmod +x gradlew
+      - run:
+          name: Download Dependencies
+          command: ./gradlew androidDependencies
+      - android/save-gradle-cache:
+          cache-prefix: v1a
       - run:
           name: Build Library
           command: ./gradlew assemble
 
-      - store_artifacts:
-          path: build/outputs/aar
 
 
   deploy:
-
-    docker:
-      - image: cimg/android:2023.06
+    executor:
+      image: android/android-docker
+      resource-class: large
+      tag: 2023.06.1
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "build.gradle" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
+      - run:
+            name: Chmod Permissions
+            command: sudo chmod +x gradlew
+      - android/restore-gradle-cache
 
       - run:
           name: Download Dependencies
-          command: |
-            chmod +x gradlew
-            ./gradlew androidDependencies
-      - save_cache:
-          paths:
-            - ~/.gradle
-          key: v1-dependencies-{{ checksum "build.gradle" }}
-
-      - attach_workspace:
-          at: /tmp/workspace
+          command: ./gradlew androidDependencies
+      - android/save-gradle-cache:
+          cache-prefix: v1a
 
       - run:
           name: Publish library
