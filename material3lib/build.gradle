@@ -20,12 +20,34 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            versionNameSuffix "-RELEASE"
+
+            versionNameSuffix "-release"
         }
         debug {
-            versionNameSuffix "-DEBUG"
+            versionNameSuffix "-debug"
         }
     }
+
+//    flavorDimensions "version"
+//
+//    productFlavors{
+//        major {
+//            dimension "version"
+//           // applicationIdSuffix ".major"
+//            versionNameSuffix "-major"
+//        }
+//        dev {
+//            dimension "version"
+//           // applicationIdSuffix ".dev"
+//            versionNameSuffix "-dev"
+//        }
+//        snapshot{
+//            dimension "version"
+//           // applicationIdSuffix ".snapshot"
+//            versionNameSuffix ".snapshot"
+//        }
+//    }
+
 
 
     compileOptions {
@@ -37,6 +59,15 @@ android {
         singleVariant('release'){
             withSourcesJar()
         }
+
+//        multipleVariants{
+//            allVariants()
+////            includeBuildTypeValues('debug', 'release')
+////            includeFlavorDimensionAndValues('major')
+////            includeFlavorDimensionAndValues('dev')
+////            includeFlavorDimensionAndValues('snapshot')
+//           withSourcesJar()
+//        }
     }
 }
 
@@ -51,6 +82,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
 }
+
 
 
 def getVersion (){
@@ -78,47 +110,50 @@ def getVersion (){
 
 String artifactVersion = getVersion()
 
-        publishing {
+String artifactVersion = getVersion()
 
-    publications {
+    publishing {
+        repositories {
+            maven{
+                name = "GithubPackages"
+                url = "https://maven.pkg.github.com/nuilewis/material3lib"
 
-        maven(MavenPublication){
-            groupId 'com.nuilewis'
-            artifactId 'material3lib'
-            version "1.0.0-$artifactVersion"
-            afterEvaluate{
-                from components.release
+                credentials {
+                    username = System.getenv('GITHUB_ACTOR')
+                    password = System.getenv('GITHUB_TOKEN')
+                }
+
             }
 
-            pom {
-                name = 'Material 3 Lib'
-                description = "A Simple Library that uses Material 3 as a transitive dependency"
-                developers {
-                    developer {
-                        id = 'nuilewis'
-                        name = "Nuikweh Lewis"
-                        email = "test@nuilewis.com"
+        }
+
+        publications {
+            maven(MavenPublication){
+                afterEvaluate(){
+                    from components.release
+                }
+                groupId 'com.nuilewis'
+                artifactId 'material3lib'
+                version "1.0.0-$artifactVersion"
+
+                pom {
+                    name = 'Material 3 Lib'
+                    description = "A Simple Library that uses Material 3 as a transitive dependency"
+                    developers {
+                        developer {
+                            id = 'nuilewis'
+                            name = "Nuikweh Lewis"
+                            email = "test@nuilewis.com"
+                        }
                     }
                 }
+
+                //artifact("$buildDir/outputs/aar/material3lib-release.aar")
+                //artifact(task.outputs.getFiles().getSingleFile())
             }
-
-            //artifact("$buildDir/outputs/aar/material3lib-release.aar")
-            //artifact(task.outputs.getFiles().getSingleFile())
         }
-    }
-    repositories {
 
-        maven{
-            name = "GithubPackages"
-            url = "https://maven.pkg.github.com/nuilewis/material3lib"
-
-            credentials {
-                username = System.getenv('GITHUB_ACTOR')
-                password = System.getenv('GITHUB_TOKEN')
-            }
-
-        }
 
     }
 
-}
+

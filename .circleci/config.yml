@@ -2,105 +2,101 @@
 # See: https://circleci.com/docs/configuration-reference
 version: 2.1
 
+orbs:
+  android: circleci/android@2.3.0
 jobs:
   test:
-  
-    docker:
-      - image: cimg/android:2023.06
+    executor:
+      name: android/android-machine
+      resource-class: large
+      tag: 2023.06.1
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "build.gradle" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
-
       - run:
-          name: "Download Dependencies"
-          command: |
-            chmod +x gradlew
-            ./gradlew androidDependencies
-      - save_cache:
-          paths:
-            - ~/.gradle
-          key: v1-dependencies-{{ checksum "build.gradle" }}
-   
+          name: Chmod Permissions
+          command: sudo chmod +x gradlew
       - run:
-          name: Run tests
+          name: Download Dependencies
+          command: ./gradlew androidDependencies
+      - run:
+          name: run unit test
           command: ./gradlew test
-      - store_test_results:
-          path: build/test-results/testDebugUnitTest/
+      - android/run-tests:
+          test-command: ./gradlew test
+      # - android/save-gradle-cache:
+      #     cache-prefix: v1a
 
 
   build:
-  
     docker:
       - image: cimg/android:2023.06
+
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "build.gradle" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
-
+      - android/restore-gradle-cache
       - run:
-          name: "Download Dependencies"
-          command: |
-            chmod +x gradlew
-            ./gradlew androidDependencies
-      - save_cache:
-          paths:
-            - ~/.gradle
-          key: v1-dependencies-{{ checksum "build.gradle" }}
-   
+          name: Chmod Permissions
+          command: sudo chmod +x gradlew
+      - run:
+          name: Download Dependencies
+          command: ./gradlew androidDependencies
+      - android/save-gradle-cache:
+          cache-prefix: v1a
       - run:
           name: Build Library
           command: ./gradlew assemble
 
-      - store_artifacts:
-          path: build/outputs/aar
+
 
   deploy:
-  
-    docker:
-      - image: cimg/android:2023.06
+    executor:
+      name: android/android-docker
+      resource-class: large
+      tag: 2023.06.1
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "build.gradle" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
+      - run:
+            name: Chmod Permissions
+            command: sudo chmod +x gradlew
+      - android/restore-gradle-cache
 
       - run:
           name: Download Dependencies
-          command: |
-            chmod +x gradlew
-            ./gradlew androidDependencies
-      - save_cache:
-          paths:
-            - ~/.gradle
-          key: v1-dependencies-{{ checksum "build.gradle" }}
-
-      - attach_workspace:
-          at: /tmp/workspace
+          command: ./gradlew androidDependencies
+      - android/save-gradle-cache
 
       - run:
           name: Publish library
           command: ./gradlew publish
 
-      
+  trigger-children-pipelines:
+    docker:
+      - image: cimg/base:2023.06
+    resource_class: small
+    steps:
+      - run:
+          name: Trigger children pipelines
+          command: |
+            curl --location --request POST "https://circleci.com/api/v2/project/github/nuilewis/customtestapp/pipeline" \
+              --header 'Content-Type: application/json' \
+              -u "${API_TOKEN}:" \
+              --data '{"branch":"main"}' \
+
+#you can pass info such as the latest version of the deploy library
+#so it would be used by the downstream pipelines
 
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
 workflows:
-  say-hello-workflow:
+  test-build-publish-workflow:
     jobs:
       - test
-      - build:
-          requires:
-            - test
+      - build
       - deploy:
           requires:
+            - test
             - build
+
+      - trigger-children-pipelines:
+          requires:
+            - deploy
