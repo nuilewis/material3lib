@@ -99,7 +99,7 @@ def getVersion (){
     String version
 
     if(branchName == "main"){
-        version = "RELEASE"
+        version = "RELEASE - $buildDate"
 
     } else{
         version = "SNAPSHOT -$buildDate"
@@ -107,8 +107,6 @@ def getVersion (){
 
     return version
 }
-
-String artifactVersion = getVersion()
 
 String artifactVersion = getVersion()
 
