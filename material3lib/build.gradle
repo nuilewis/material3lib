@@ -27,25 +27,25 @@ android {
         }
     }
 
-    flavorDimensions "version"
-
-    productFlavors{
-        major {
-            dimension "version"
-           // applicationIdSuffix ".major"
-            versionNameSuffix "-major"
-        }
-        dev {
-            dimension "version"
-           // applicationIdSuffix ".dev"
-            versionNameSuffix "-dev"
-        }
-        snapshot{
-            dimension "version"
-           // applicationIdSuffix ".snapshot"
-            versionNameSuffix ".snapshot"
-        }
-    }
+//    flavorDimensions "version"
+//
+//    productFlavors{
+//        major {
+//            dimension "version"
+//           // applicationIdSuffix ".major"
+//            versionNameSuffix "-major"
+//        }
+//        dev {
+//            dimension "version"
+//           // applicationIdSuffix ".dev"
+//            versionNameSuffix "-dev"
+//        }
+//        snapshot{
+//            dimension "version"
+//           // applicationIdSuffix ".snapshot"
+//            versionNameSuffix ".snapshot"
+//        }
+//    }
 
 
     compileOptions {
@@ -54,14 +54,18 @@ android {
     }
 
     publishing{
-        multipleVariants{
-            allVariants()
-//            includeBuildTypeValues('debug', 'release')
-//            includeFlavorDimensionAndValues('major')
-//            includeFlavorDimensionAndValues('dev')
-//            includeFlavorDimensionAndValues('snapshot')
-           withSourcesJar()
+        singleVariant('release'){
+            withSourcesJar()
         }
+
+//        multipleVariants{
+//            allVariants()
+////            includeBuildTypeValues('debug', 'release')
+////            includeFlavorDimensionAndValues('major')
+////            includeFlavorDimensionAndValues('dev')
+////            includeFlavorDimensionAndValues('snapshot')
+//           withSourcesJar()
+//        }
     }
 }
 
@@ -103,49 +107,48 @@ def static getVersion (){
 
 String artifactVersion = getVersion()
 
+    publishing {
+        repositories {
+            maven{
+                name = "GithubPackages"
+                url = "https://maven.pkg.github.com/nuilewis/material3lib"
 
-        publishing {
+                credentials {
+                    username = System.getenv('GITHUB_ACTOR')
+                    password = System.getenv('GITHUB_TOKEN')
+                }
 
-
-    publications {
-
-        maven(MavenPublication){
-            groupId 'com.nuilewis'
-            artifactId 'material3lib'
-            version "1.0.0-$artifactVersion"
-            afterEvaluate{
-                from components.with {}
             }
 
-            pom {
-                name = 'Material 3 Lib'
-                description = "A Simple Library that uses Material 3 as a transitive dependency"
-                developers {
-                    developer {
-                        id = 'nuilewis'
-                        name = "Nuikweh Lewis"
-                        email = "test@nuilewis.com"
+        }
+
+        publications {
+            maven(MavenPublication){
+                afterEvaluate(){
+                    from components.release
+                }
+                groupId 'com.nuilewis'
+                artifactId 'material3lib'
+                version "1.0.0-$artifactVersion"
+
+                pom {
+                    name = 'Material 3 Lib'
+                    description = "A Simple Library that uses Material 3 as a transitive dependency"
+                    developers {
+                        developer {
+                            id = 'nuilewis'
+                            name = "Nuikweh Lewis"
+                            email = "test@nuilewis.com"
+                        }
                     }
                 }
+
+                //artifact("$buildDir/outputs/aar/material3lib-release.aar")
+                //artifact(task.outputs.getFiles().getSingleFile())
             }
-
-            //artifact("$buildDir/outputs/aar/material3lib-release.aar")
-            //artifact(task.outputs.getFiles().getSingleFile())
         }
-    }
-    repositories {
 
-        maven{
-            name = "GithubPackages"
-            url = "https://maven.pkg.github.com/nuilewis/material3lib"
-
-            credentials {
-                username = System.getenv('GITHUB_ACTOR')
-                password = System.getenv('GITHUB_TOKEN')
-            }
-
-        }
 
     }
 
-}
+
