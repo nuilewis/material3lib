@@ -20,6 +20,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
             versionNameSuffix "-release"
         }
         debug {
@@ -46,6 +47,7 @@ android {
 //            versionNameSuffix ".snapshot"
 //        }
 //    }
+
 
 
     compileOptions {
@@ -82,7 +84,8 @@ dependencies {
 }
 
 
-def static getVersion (){
+
+def getVersion (){
 
     // Gets the appropriate version name depending on the current branch.
     // 'RELEASE' will be appended to the version number for the 'main' branch and
@@ -99,11 +102,13 @@ def static getVersion (){
         version = "RELEASE"
 
     } else{
-        version = "SNAPSHOT-$buildDate"
+        version = "SNAPSHOT -$buildDate"
     }
 
     return version
 }
+
+String artifactVersion = getVersion()
 
 String artifactVersion = getVersion()
 
